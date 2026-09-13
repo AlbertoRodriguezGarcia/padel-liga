@@ -50,13 +50,26 @@
   section[hidden] { display: none; }
 
   /* Próximo partido */
-  .next { padding: 22px 0 18px; border-bottom: 1px solid var(--rule); }
+  .next { padding: 22px 0 20px; border-bottom: 1px solid var(--rule); }
   .next .when { margin: 0 0 10px; font-weight: 600; color: var(--green); font-size: 15px; }
   .next .team { font: 700 34px/1 "IBM Plex Sans Condensed", sans-serif; margin: 0; }
   .next .vs { color: var(--ink-2); font-size: 14px; margin: 6px 0; }
   .next .where { margin: 14px 0 0; font-size: 15px; }
   .next .where b { font-weight: 600; }
   .next .jornada { font-size: 13px; color: var(--ink-2); margin: 4px 0 0; }
+  .next .when small { font-weight: 400; color: var(--ink-2); margin-left: 8px; }
+  .next .where a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--ink-2); text-underline-offset: 3px; }
+  .next .rival { font-size: 14px; color: var(--ink-2); margin: 2px 0 0; }
+  .actions { margin: 16px 0 0; }
+  .actions a {
+    display: inline-block; padding: 8px 14px; border: 1px solid var(--ink); border-radius: 3px;
+    color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500;
+  }
+  .form { display: inline-flex; gap: 4px; vertical-align: middle; margin-left: 6px; }
+  .form i { font-style: normal; font-size: 12px; font-weight: 600; width: 20px; height: 20px; line-height: 20px; text-align: center; border-radius: 3px; color: #fff; }
+  .form i.v { background: var(--green); }
+  .form i.d { background: var(--red); }
+  .match .meta a { color: inherit; }
 
   .status { padding: 14px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
   .status b { font-weight: 600; }
@@ -102,18 +115,6 @@
   footer a { color: var(--ink); }
   .warn { margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--red); font-size: 13px; }
 
-  /* Instalación */
-  .install {
-    margin: 14px 0 0; padding: 10px 0 12px; border-bottom: 1px solid var(--rule);
-    font-size: 14px; color: var(--ink-2); display: flex; gap: 12px; align-items: center; justify-content: space-between;
-  }
-  .install > span:last-child { display: flex; align-items: center; gap: 4px; }
-  .install button {
-    background: var(--ink); color: #fff; border: 0; border-radius: 3px;
-    padding: 7px 12px; font: 500 14px "IBM Plex Sans", sans-serif; cursor: pointer; white-space: nowrap;
-  }
-  .install .close { background: none; color: var(--ink-2); padding: 4px 6px; font-size: 18px; }
-
   /* En pantallas grandes: encajonar como un teléfono y avisar */
   #desktop-note { display: none; }
   @media (min-width: 700px) and (pointer: fine) {
@@ -140,7 +141,6 @@
 
 <main>
   <div id="warn" class="warn" hidden></div>
-  <div id="install" class="install" hidden><span>Añádela a tu pantalla de inicio para abrirla como una app.</span><span><button id="install-btn">Instalar</button><button class="close" id="install-close" aria-label="Cerrar">×</button></span></div>
   <section id="next" role="tabpanel"></section>
   <section id="cal" role="tabpanel" hidden></section>
   <section id="table" role="tabpanel" hidden></section>
@@ -162,6 +162,26 @@ function fmtDate(iso, hora) {
   let s = `${DIAS[d.getDay()]} ${d.getDate()} ${MESES[d.getMonth()]}`;
   if (hora) s += ` · ${hora}`;
   return s;
+}
+function relDays(iso) {
+  if (!iso) return "";
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  const diff = Math.round((new Date(iso + "T00:00:00") - t) / 864e5);
+  if (diff === 0) return "hoy"; if (diff === 1) return "mañana";
+  if (diff > 1) return `faltan ${diff} días`;
+  return "";
+}
+function mapsLink(sede) { return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(sede + " padel Bizkaia")}`; }
+function icsLink(m, mine) {
+  const start = new Date(m.fecha + "T" + (m.hora || "10:00") + ":00");
+  const end = new Date(start.getTime() + 2.5 * 3600e3);
+  const f = d => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//padel-liga//ES", "BEGIN:VEVENT",
+    `UID:${m.fecha}-${m.local}-${m.visitante}@padel-liga`, `DTSTAMP:${f(new Date())}`,
+    `DTSTART:${f(start)}`, `DTEND:${f(end)}`,
+    `SUMMARY:Pádel: ${m.local} - ${m.visitante}`, `LOCATION:${m.sede || ""}`,
+    `DESCRIPTION:Jornada ${m.jornada} · Liga Bizkaina`, "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+  return "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
 }
 function isMine(name, mine) { return mine && norm(name) === norm(mine); }
 function matchDate(m) {
@@ -207,14 +227,18 @@ function render(d) {
     nextEl.innerHTML = `<div class="empty">No hay más partidos pendientes. ${mine ? "" : "Indica tu equipo en config.json para ver solo los vuestros."}</div>`;
   } else {
     const home = isMine(next.local, mine);
+    const rivalName = home ? next.visitante : next.local;
+    const rivalRow = mine ? d.clasificacion.find(r => isMine(r.equipo, rivalName)) : null;
     nextEl.innerHTML = `
       <div class="next">
-        <p class="when">${fmtDate(next.fecha, next.hora)}</p>
+        <p class="when">${fmtDate(next.fecha, next.hora)}<small>${relDays(next.fecha)}</small></p>
         <p class="team">${next.local}</p>
         <p class="vs">contra</p>
         <p class="team">${next.visitante}</p>
-        <p class="where">${next.sede ? `En <b>${next.sede}</b>` : "Sede por confirmar"}${mine ? (home ? ", en casa" : ", fuera") : ""}</p>
+        ${rivalRow && rivalRow.pj ? `<p class="rival">El rival va ${rivalRow.pos}º con ${rivalRow.puntos} puntos</p>` : ""}
+        <p class="where">${next.sede ? `En <a href="${mapsLink(next.sede)}" target="_blank" rel="noopener">${next.sede}</a>` : "Sede por confirmar"}${mine ? (home ? ", en casa" : ", fuera") : ""}</p>
         <p class="jornada">Jornada ${next.jornada}</p>
+        ${next.fecha ? `<p class="actions"><a href="${icsLink(next, mine)}" download="partido-jornada-${next.jornada}.ics">Añadir a mi calendario</a></p>` : ""}
       </div>`;
   }
 
@@ -223,7 +247,7 @@ function render(d) {
     if (row) {
       const ord = n => n + "º";
       nextEl.insertAdjacentHTML("beforeend", `
-        <p class="status">Vamos <b>${ord(row.pos)} de ${d.clasificacion.length}</b> con <b>${row.puntos} puntos</b>: ${row.pg} ${row.pg === 1 ? "victoria" : "victorias"} y ${row.pp} ${row.pp === 1 ? "derrota" : "derrotas"}.</p>`);
+        <p class="status">Vamos <b>${ord(row.pos)} de ${d.clasificacion.length}</b> con <b>${row.puntos} puntos</b>: ${row.pg} ${row.pg === 1 ? "victoria" : "victorias"} y ${row.pp} ${row.pp === 1 ? "derrota" : "derrotas"}.${played.length ? ` <span class="form">${played.slice(0, 5).reverse().map(m => { const w = isMine(m.local, mine) ? m.goles_local > m.goles_visitante : m.goles_visitante > m.goles_local; return `<i class="${w ? "v" : "d"}">${w ? "V" : "D"}</i>`; }).join("")}</span>` : ""}</p>`);
     }
   }
   if (next) {
@@ -278,29 +302,11 @@ function matchHTML(m, mine) {
     <div class="t">${m.local}</div>
     <div class="s ${m.jugado ? "" : "pending"}">${m.jugado ? `${m.goles_local} – ${m.goles_visitante}` : (m.hora || "–")}</div>
     <div class="t r">${m.visitante}</div>
-    <div class="meta">${fmtDate(m.fecha, m.jugado ? null : null)}${m.sede ? " · " + m.sede : ""}</div>
+    <div class="meta">${fmtDate(m.fecha)}${m.sede ? ` · <a href="${mapsLink(m.sede)}" target="_blank" rel="noopener">${m.sede}</a>` : ""}</div>
   </div>`;
 }
 
-// --- Instalación como app
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
-const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
-let deferred = null;
-window.addEventListener("beforeinstallprompt", e => {
-  e.preventDefault(); deferred = e;
-  if (!standalone && !sessionStorage.getItem("install-hidden")) $("#install").hidden = false;
-});
-$("#install-btn").addEventListener("click", async () => {
-  if (deferred) { deferred.prompt(); await deferred.userChoice; deferred = null; $("#install").hidden = true; }
-});
-$("#install-close").addEventListener("click", () => { $("#install").hidden = true; sessionStorage.setItem("install-hidden", "1"); });
-// iOS no lanza beforeinstallprompt: indicar el gesto manual
-const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-if (isIOS && !standalone && !sessionStorage.getItem("install-hidden")) {
-  $("#install").hidden = false;
-  $("#install").firstElementChild.textContent = "En Safari: botón Compartir → «Añadir a pantalla de inicio».";
-  $("#install-btn").hidden = true;
-}
 </script>
 </body>
 </html>
