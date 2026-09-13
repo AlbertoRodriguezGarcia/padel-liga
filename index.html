@@ -93,6 +93,11 @@
   .legend { font-size: 12px; color: var(--ink-2); margin-top: 10px; }
 
   .empty { padding: 24px 0; color: var(--ink-2); }
+  details.pending { margin-top: 22px; border-top: 1px solid var(--rule); }
+  details.pending summary { padding: 14px 0; font-weight: 500; cursor: pointer; list-style: none; display: flex; justify-content: space-between; }
+  details.pending summary::after { content: "+"; color: var(--ink-2); }
+  details.pending[open] summary::after { content: "–"; }
+  details.pending summary::-webkit-details-marker { display: none; }
   footer { text-align: center; font-size: 12px; color: var(--ink-2); padding: 26px 20px 34px; }
   footer a { color: var(--ink); }
   .warn { margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--red); font-size: 13px; }
@@ -127,8 +132,8 @@
   <h1 id="team">PADEL ZAMUDIO M6</h1>
   <p id="league">Cargando…</p>
   <nav role="tablist">
-    <button role="tab" aria-selected="true" data-tab="next">Próximo</button>
-    <button role="tab" aria-selected="false" data-tab="cal">Calendario</button>
+    <button role="tab" aria-selected="true" data-tab="next">Próxima</button>
+    <button role="tab" aria-selected="false" data-tab="cal">Resultados</button>
     <button role="tab" aria-selected="false" data-tab="table">Clasificación</button>
   </nav>
 </header>
@@ -221,16 +226,27 @@ function render(d) {
         <p class="status">Vamos <b>${ord(row.pos)} de ${d.clasificacion.length}</b> con <b>${row.puntos} puntos</b>: ${row.pg} ${row.pg === 1 ? "victoria" : "victorias"} y ${row.pp} ${row.pp === 1 ? "derrota" : "derrotas"}.</p>`);
     }
   }
-  if (played.length) {
-    nextEl.insertAdjacentHTML("beforeend", `<div class="recent"><h2>Últimos resultados</h2>${played.slice(0, 3).map(m => matchHTML(m, mine)).join("")}</div>`);
+  if (next) {
+    const jor = d.jornadas.find(j => j.numero === next.jornada);
+    const rest = jor ? jor.partidos.filter(m => m !== next && !(m.local === next.local && m.visitante === next.visitante)) : [];
+    if (rest.length) nextEl.insertAdjacentHTML("beforeend", `<div class="recent"><h2>Resto de la jornada ${next.jornada}</h2>${rest.map(m => matchHTML(m, mine)).join("")}</div>`);
+  }
+  const lastPlayed = played[0];
+  if (lastPlayed) {
+    nextEl.insertAdjacentHTML("beforeend", `<div class="recent"><h2>Nuestro último partido</h2>${matchHTML(lastPlayed, mine)}</div>`);
   }
 
-  // --- Calendario
-  $("#cal").innerHTML = d.jornadas.map(j => {
-    const dates = j.partidos.map(matchDate).filter(Boolean);
-    const range = dates.length ? fmtDate(j.partidos.find(matchDate).fecha).replace(/^\w+ /, "") : "";
+  // --- Resultados
+  const jornadaHTML = j => {
+    const first = j.partidos.find(matchDate);
+    const range = first ? fmtDate(first.fecha).replace(/^\S+ /, "") : "";
     return `<div class="jornada-block"><h2>Jornada ${j.numero} <small>${range}</small></h2>${j.partidos.map(m => matchHTML(m, mine)).join("")}</div>`;
-  }).join("") || `<div class="empty">Todavía no hay calendario publicado.</div>`;
+  };
+  const playedJ = d.jornadas.filter(j => j.partidos.some(m => m.jugado)).sort((a, b) => b.numero - a.numero);
+  const pendingJ = d.jornadas.filter(j => !j.partidos.some(m => m.jugado));
+  $("#cal").innerHTML =
+    (playedJ.length ? playedJ.map(jornadaHTML).join("") : `<div class="empty">Todavía no se ha jugado ninguna jornada.</div>`) +
+    (pendingJ.length ? `<details class="pending"><summary>Jornadas pendientes (${pendingJ.length})</summary>${pendingJ.map(jornadaHTML).join("")}</details>` : "");
 
   // --- Clasificación
   $("#table").innerHTML = d.clasificacion.length ? `
