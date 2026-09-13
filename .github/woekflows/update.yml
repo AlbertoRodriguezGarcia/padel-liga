@@ -1,0 +1,31 @@
+name: Actualizar datos de la liga
+
+on:
+  schedule:
+    # Cada 3 horas viernes, sábado y domingo (horario UTC); cada 12 h el resto
+    - cron: "0 */3 * * 5,6,0"
+    - cron: "0 6,18 * * 1-4"
+  workflow_dispatch:      # botón manual en la pestaña Actions
+  push:
+    paths: [config.json, scrape.py]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python scrape.py
+      - name: Guardar cambios
+        run: |
+          git config user.name "liga-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data.json
+          git diff --cached --quiet || git commit -m "Datos actualizados $(date -u +'%Y-%m-%d %H:%M')"
+          git push
