@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Zamudio M6">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Liga · nuestro equipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --ink: #151515;
+    --ink-2: #6A6A6A;
+    --rule: #E3E3E3;
+    --green: #1D6B3E;       /* verde pista */
+    --green-soft: #EDF5EF;
+    --red: #B23A2C;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 16px; line-height: 1.45;
+    font-feature-settings: "tnum";
+  }
+  .cond { font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif; }
+
+  header { padding: max(20px, env(safe-area-inset-top)) 20px 0; border-bottom: 1px solid var(--rule); }
+  header h1 { margin: 0; font: 700 28px/1.05 "IBM Plex Sans Condensed", sans-serif; }
+  header p { margin: 4px 0 16px; font-size: 14px; color: var(--ink-2); }
+
+  nav { display: flex; gap: 22px; }
+  nav button {
+    background: none; border: 0; padding: 0 0 10px; margin-bottom: -1px; cursor: pointer;
+    font: 500 15px "IBM Plex Sans", sans-serif; color: var(--ink-2);
+    border-bottom: 2px solid transparent;
+  }
+  nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+  nav button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+  main { padding: 0 20px; max-width: 640px; margin: 0 auto; }
+  section[hidden] { display: none; }
+
+  /* Próximo partido */
+  .next { padding: 22px 0 18px; border-bottom: 1px solid var(--rule); }
+  .next .when { margin: 0 0 10px; font-weight: 600; color: var(--green); font-size: 15px; }
+  .next .team { font: 700 34px/1 "IBM Plex Sans Condensed", sans-serif; margin: 0; }
+  .next .vs { color: var(--ink-2); font-size: 14px; margin: 6px 0; }
+  .next .where { margin: 14px 0 0; font-size: 15px; }
+  .next .where b { font-weight: 600; }
+  .next .jornada { font-size: 13px; color: var(--ink-2); margin: 4px 0 0; }
+
+  .status { padding: 14px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
+  .status b { font-weight: 600; }
+
+  .recent h2, .jornada-block h2 { font: 600 13px "IBM Plex Sans", sans-serif; color: var(--ink-2); margin: 20px 0 4px; }
+  .jornada-block h2 { display: flex; justify-content: space-between; }
+  .jornada-block h2 small { font-weight: 400; }
+
+  /* Partidos como filas */
+  .match {
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 12px;
+    padding: 11px 0; border-bottom: 1px solid var(--rule);
+  }
+  .match .t { font-size: 15px; line-height: 1.25; }
+  .match .t.r { text-align: right; }
+  .match .s { font: 600 17px "IBM Plex Sans", sans-serif; min-width: 44px; text-align: center; }
+  .match .s.pending { color: var(--ink-2); font-weight: 400; font-size: 14px; }
+  .match .meta { grid-column: 1 / -1; font-size: 13px; color: var(--ink-2); margin-top: 3px; }
+  .match.mine { position: relative; }
+  .match.mine::before { content: ""; position: absolute; left: -20px; top: 0; bottom: 0; width: 3px; background: var(--green); }
+  .match.mine .t { font-weight: 600; }
+  .match.mine.won .s { color: var(--green); }
+  .match.mine.lost .s { color: var(--red); }
+
+  /* Clasificación */
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th, td { padding: 10px 4px; text-align: right; font-size: 14px; border-bottom: 1px solid var(--rule); }
+  th { font-weight: 500; color: var(--ink-2); font-size: 12px; }
+  td.name, th.name { text-align: left; }
+  td.pos { color: var(--ink-2); width: 28px; text-align: left; }
+  td.pts { font-weight: 600; }
+  tr.mine td { background: var(--green-soft); font-weight: 600; }
+  tr.mine td.pos { color: var(--green); }
+  .legend { font-size: 12px; color: var(--ink-2); margin-top: 10px; }
+
+  .empty { padding: 24px 0; color: var(--ink-2); }
+  footer { text-align: center; font-size: 12px; color: var(--ink-2); padding: 26px 20px 34px; }
+  footer a { color: var(--ink); }
+  .warn { margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--red); font-size: 13px; }
+
+  /* Instalación */
+  .install {
+    margin: 14px 0 0; padding: 10px 0 12px; border-bottom: 1px solid var(--rule);
+    font-size: 14px; color: var(--ink-2); display: flex; gap: 12px; align-items: center; justify-content: space-between;
+  }
+  .install > span:last-child { display: flex; align-items: center; gap: 4px; }
+  .install button {
+    background: var(--ink); color: #fff; border: 0; border-radius: 3px;
+    padding: 7px 12px; font: 500 14px "IBM Plex Sans", sans-serif; cursor: pointer; white-space: nowrap;
+  }
+  .install .close { background: none; color: var(--ink-2); padding: 4px 6px; font-size: 18px; }
+
+  /* En pantallas grandes: encajonar como un teléfono y avisar */
+  #desktop-note { display: none; }
+  @media (min-width: 700px) and (pointer: fine) {
+    body { background: #ECECEC; }
+    #app { width: 400px; min-height: 100vh; margin: 0 auto; background: var(--bg); border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); }
+    #desktop-note {
+      display: block; position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+      background: var(--ink); color: #fff; padding: 8px 14px; border-radius: 3px; font-size: 13px; white-space: nowrap;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <h1 id="team">PADEL ZAMUDIO M6</h1>
+  <p id="league">Cargando…</p>
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-tab="next">Próximo</button>
+    <button role="tab" aria-selected="false" data-tab="cal">Calendario</button>
+    <button role="tab" aria-selected="false" data-tab="table">Clasificación</button>
+  </nav>
+</header>
+
+<main>
+  <div id="warn" class="warn" hidden></div>
+  <div id="install" class="install" hidden><span>Añádela a tu pantalla de inicio para abrirla como una app.</span><span><button id="install-btn">Instalar</button><button class="close" id="install-close" aria-label="Cerrar">×</button></span></div>
+  <section id="next" role="tabpanel"></section>
+  <section id="cal" role="tabpanel" hidden></section>
+  <section id="table" role="tabpanel" hidden></section>
+</main>
+
+<footer id="foot"></footer>
+</div>
+<div id="desktop-note">Esta app está pensada para el móvil: abre el enlace en tu teléfono</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const norm = s => (s || "").toLowerCase().replace(/\s+/g, " ").trim();
+const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+function fmtDate(iso, hora) {
+  if (!iso) return "fecha por confirmar";
+  const d = new Date(iso + "T00:00:00");
+  let s = `${DIAS[d.getDay()]} ${d.getDate()} ${MESES[d.getMonth()]}`;
+  if (hora) s += ` · ${hora}`;
+  return s;
+}
+function isMine(name, mine) { return mine && norm(name) === norm(mine); }
+function matchDate(m) {
+  if (!m.fecha) return null;
+  return new Date(m.fecha + "T" + (m.hora || "00:00") + ":00");
+}
+
+// Pestañas
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("nav button").forEach(x => x.setAttribute("aria-selected", x === b));
+  document.querySelectorAll("main section").forEach(s => s.hidden = s.id !== b.dataset.tab);
+  history.replaceState(null, "", "#" + b.dataset.tab);
+}));
+if (location.hash) { const b = document.querySelector(`nav button[data-tab="${location.hash.slice(1)}"]`); if (b) b.click(); }
+
+fetch("data.json?t=" + Date.now()).then(r => r.json()).then(render).catch(() => {
+  $("#league").textContent = "No se han podido cargar los datos.";
+});
+
+function render(d) {
+  const mine = d.mi_equipo && d.mi_equipo !== "CAMBIA_POR_TU_EQUIPO" ? d.mi_equipo : null;
+  $("#team").textContent = mine || "Grupo completo";
+  $("#league").textContent = d.titulo;
+  document.title = (mine || "Liga") + " · liga";
+
+  if (d.avisos && d.avisos.length) {
+    $("#warn").hidden = false;
+    $("#warn").textContent = "Alguna jornada no se ha podido leer en la última actualización; se muestran los últimos datos disponibles.";
+  }
+
+  // --- Todos los partidos, ordenados
+  const all = [];
+  d.jornadas.forEach(j => j.partidos.forEach(m => all.push({ ...m, jornada: j.numero })));
+  const myMatches = mine ? all.filter(m => isMine(m.local, mine) || isMine(m.visitante, mine)) : all;
+  const now = new Date();
+  const upcoming = myMatches.filter(m => !m.jugado).sort((a, b) => (matchDate(a) || 9e15) - (matchDate(b) || 9e15));
+  const next = upcoming.find(m => { const dt = matchDate(m); return !dt || dt >= new Date(now - 6 * 3600e3); }) || upcoming[0];
+  const played = myMatches.filter(m => m.jugado).sort((a, b) => b.jornada - a.jornada);
+
+  // --- Próximo
+  const nextEl = $("#next");
+  if (!next) {
+    nextEl.innerHTML = `<div class="empty">No hay más partidos pendientes. ${mine ? "" : "Indica tu equipo en config.json para ver solo los vuestros."}</div>`;
+  } else {
+    const home = isMine(next.local, mine);
+    nextEl.innerHTML = `
+      <div class="next">
+        <p class="when">${fmtDate(next.fecha, next.hora)}</p>
+        <p class="team">${next.local}</p>
+        <p class="vs">contra</p>
+        <p class="team">${next.visitante}</p>
+        <p class="where">${next.sede ? `En <b>${next.sede}</b>` : "Sede por confirmar"}${mine ? (home ? ", en casa" : ", fuera") : ""}</p>
+        <p class="jornada">Jornada ${next.jornada}</p>
+      </div>`;
+  }
+
+  if (mine) {
+    const row = d.clasificacion.find(r => isMine(r.equipo, mine));
+    if (row) {
+      const ord = n => n + "º";
+      nextEl.insertAdjacentHTML("beforeend", `
+        <p class="status">Vamos <b>${ord(row.pos)} de ${d.clasificacion.length}</b> con <b>${row.puntos} puntos</b>: ${row.pg} ${row.pg === 1 ? "victoria" : "victorias"} y ${row.pp} ${row.pp === 1 ? "derrota" : "derrotas"}.</p>`);
+    }
+  }
+  if (played.length) {
+    nextEl.insertAdjacentHTML("beforeend", `<div class="recent"><h2>Últimos resultados</h2>${played.slice(0, 3).map(m => matchHTML(m, mine)).join("")}</div>`);
+  }
+
+  // --- Calendario
+  $("#cal").innerHTML = d.jornadas.map(j => {
+    const dates = j.partidos.map(matchDate).filter(Boolean);
+    const range = dates.length ? fmtDate(j.partidos.find(matchDate).fecha).replace(/^\w+ /, "") : "";
+    return `<div class="jornada-block"><h2>Jornada ${j.numero} <small>${range}</small></h2>${j.partidos.map(m => matchHTML(m, mine)).join("")}</div>`;
+  }).join("") || `<div class="empty">Todavía no hay calendario publicado.</div>`;
+
+  // --- Clasificación
+  $("#table").innerHTML = d.clasificacion.length ? `
+    <table>
+      <thead><tr><th></th><th class="name">Equipo</th><th>Pt</th><th>PJ</th><th>PG</th><th>PP</th><th>SG</th><th>SP</th></tr></thead>
+      <tbody>${d.clasificacion.map(r => `
+        <tr class="${isMine(r.equipo, mine) ? "mine" : ""}">
+          <td class="pos">${r.pos}</td><td class="name">${r.equipo}</td><td class="pts">${r.puntos}</td>
+          <td>${r.pj}</td><td>${r.pg}</td><td>${r.pp}</td><td>${r.sg}</td><td>${r.sp}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table>
+    <p class="legend">Pt puntos · PJ jugados · PG ganados · PP perdidos · SG/SP sets a favor y en contra</p>`
+    : `<div class="empty">Todavía no hay clasificación.</div>`;
+
+  const upd = new Date(d.actualizado);
+  $("#foot").innerHTML = `Actualizado ${upd.toLocaleString("es-ES", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+    · <a href="${d.fuente}" target="_blank" rel="noopener">ver en la federación</a>`;
+}
+
+function matchHTML(m, mine) {
+  const my = isMine(m.local, mine) || isMine(m.visitante, mine);
+  let res = "";
+  if (my && m.jugado) {
+    const won = isMine(m.local, mine) ? m.goles_local > m.goles_visitante : m.goles_visitante > m.goles_local;
+    res = won ? "won" : "lost";
+  }
+  return `<div class="match ${my ? "mine" : ""} ${res}">
+    <div class="t">${m.local}</div>
+    <div class="s ${m.jugado ? "" : "pending"}">${m.jugado ? `${m.goles_local} – ${m.goles_visitante}` : (m.hora || "–")}</div>
+    <div class="t r">${m.visitante}</div>
+    <div class="meta">${fmtDate(m.fecha, m.jugado ? null : null)}${m.sede ? " · " + m.sede : ""}</div>
+  </div>`;
+}
+
+// --- Instalación como app
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+let deferred = null;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault(); deferred = e;
+  if (!standalone && !sessionStorage.getItem("install-hidden")) $("#install").hidden = false;
+});
+$("#install-btn").addEventListener("click", async () => {
+  if (deferred) { deferred.prompt(); await deferred.userChoice; deferred = null; $("#install").hidden = true; }
+});
+$("#install-close").addEventListener("click", () => { $("#install").hidden = true; sessionStorage.setItem("install-hidden", "1"); });
+// iOS no lanza beforeinstallprompt: indicar el gesto manual
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+if (isIOS && !standalone && !sessionStorage.getItem("install-hidden")) {
+  $("#install").hidden = false;
+  $("#install").firstElementChild.textContent = "En Safari: botón Compartir → «Añadir a pantalla de inicio».";
+  $("#install-btn").hidden = true;
+}
+</script>
+</body>
+</html>
