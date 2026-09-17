@@ -1,28 +1,189 @@
 {
  "titulo": "Liga Bizkaina 26/27 · Masculino 5ª · Grupo 2",
  "mi_equipo": "PADEL ZAMUDIO M6",
- "actualizado": "2026-09-13T16:00+00:00",
+ "actualizado": "2026-09-17T10:57+00:00",
  "fuente": "https://www.bizkaiapadel.com/Home/JornadaLiga/34?fase=60&grupoId=54&jornada=1",
  "jornadas": [
-  {"numero": 1, "partidos": [
-   {"local": "TEAM PADEL CLUB", "visitante": "SEMINARIO PADEL CLUB DERIO M5", "goles_local": 0, "goles_visitante": 0, "fecha": "2026-09-20", "hora": "17:30", "sede": "PadelBai", "jugado": false},
-   {"local": "MARTIARTU AZUL", "visitante": "ASKARTZA TANIWA", "goles_local": 0, "goles_visitante": 0, "fecha": "2026-09-19", "hora": "09:00", "sede": "C.D. Martiartu", "jugado": false},
-   {"local": "PADEL ZAMUDIO M6", "visitante": "PADEL & GOL 5M1", "goles_local": 0, "goles_visitante": 0, "fecha": "2026-09-20", "hora": "16:30", "sede": "Padel Zamudio", "jugado": false},
-   {"local": "Padeltza Urdinak", "visitante": "PICo y Pala", "goles_local": 0, "goles_visitante": 0, "fecha": "2026-09-20", "hora": "12:00", "sede": "Padelko", "jugado": false},
-   {"local": "5 ENKARTERRI PADEL KLUBA", "visitante": "BTC SALA RAW", "goles_local": 0, "goles_visitante": 0, "fecha": "2026-09-18", "hora": "19:30", "sede": "Enkarterri Padel Indoor", "jugado": false}
-  ]}
+  {
+   "numero": 1,
+   "partidos": [
+    {
+     "local": "TEAM PADEL CLUB",
+     "visitante": "SEMINARIO PADEL CLUB DERIO M5",
+     "goles_local": 0,
+     "goles_visitante": 0,
+     "fecha": "2026-09-20",
+     "hora": "17:30",
+     "sede": "PadelBai",
+     "jugado": false
+    },
+    {
+     "local": "MARTIARTU AZUL",
+     "visitante": "ASKARTZA TANIWA",
+     "goles_local": 0,
+     "goles_visitante": 0,
+     "fecha": "2026-09-19",
+     "hora": "09:00",
+     "sede": "C.D. Martiartu",
+     "jugado": false
+    },
+    {
+     "local": "PADEL ZAMUDIO M6",
+     "visitante": "PADEL & GOL 5M1",
+     "goles_local": 0,
+     "goles_visitante": 0,
+     "fecha": "2026-09-20",
+     "hora": "16:30",
+     "sede": "Padel Zamudio",
+     "jugado": false
+    },
+    {
+     "local": "Padeltza Urdinak",
+     "visitante": "PICo y Pala",
+     "goles_local": 0,
+     "goles_visitante": 0,
+     "fecha": "2026-09-20",
+     "hora": "12:00",
+     "sede": "Padelko",
+     "jugado": false
+    },
+    {
+     "local": "5 ENKARTERRI PADEL KLUBA",
+     "visitante": "BTC SALA RAW",
+     "goles_local": 0,
+     "goles_visitante": 0,
+     "fecha": "2026-09-18",
+     "hora": "19:30",
+     "sede": "Enkarterri Padel Indoor",
+     "jugado": false
+    }
+   ]
+  }
  ],
  "clasificacion": [
-  {"pos": 1, "equipo": "TEAM PADEL CLUB", "puntos": 0, "pj": 0, "pg": 0, "pp": 0, "sg": 0, "sp": 0, "jg": 0, "jp": 0},
-  {"pos": 2, "equipo": "BTC SALA RAW", "puntos": 0, "pj": 0, "pg": 0, "pp": 0, "sg": 0, "sp": 0, "jg": 0, "jp": 0},
-  {"pos": 3, "equipo": "SEMINARIO PADEL CLUB DERIO M5", "puntos": 0, "pj": 0, "pg": 0, "pp": 0, "sg": 0, "sp": 0, "jg": 0, "jp": 0},
-  {"pos": 4, "equipo": "Padeltza Urdinak", "puntos": 0, "pj": 0, "pg": 0, "pp": 0, "sg": 0, "sp": 0, "jg": 0, "jp": 0},
-  {"pos": 5, "equipo": "ASKARTZA TANIWA", "puntos": 0, "pj": 0, "pg": 0, "pp": 0, "sg": 0, "sp": 0, "jg": 0, "jp": 0},
-  {"pos": 6, "equipo": "PADEL ZAMUDIO M6", "puntos": 0, "pj": 0, "pg": 0, "pp": 0, "sg": 0, "sp": 0, "jg": 0, "jp": 0},
-  {"pos": 7, "equipo": "PADEL & GOL 5M1", "puntos": 0, "pj": 0, "pg": 0, "pp": 0, "sg": 0, "sp": 0, "jg": 0, "jp": 0},
-  {"pos": 8, "equipo": "MARTIARTU AZUL", "puntos": 0, "pj": 0, "pg": 0, "pp": 0, "sg": 0, "sp": 0, "jg": 0, "jp": 0},
-  {"pos": 9, "equipo": "PICo y Pala", "puntos": 0, "pj": 0, "pg": 0, "pp": 0, "sg": 0, "sp": 0, "jg": 0, "jp": 0},
-  {"pos": 10, "equipo": "5 ENKARTERRI PADEL KLUBA", "puntos": 0, "pj": 0, "pg": 0, "pp": 0, "sg": 0, "sp": 0, "jg": 0, "jp": 0}
+  {
+   "pos": 1,
+   "equipo": "TEAM PADEL CLUB",
+   "puntos": 0,
+   "pj": 0,
+   "pg": 0,
+   "pp": 0,
+   "sg": 0,
+   "sp": 0,
+   "jg": 0,
+   "jp": 0
+  },
+  {
+   "pos": 2,
+   "equipo": "BTC SALA RAW",
+   "puntos": 0,
+   "pj": 0,
+   "pg": 0,
+   "pp": 0,
+   "sg": 0,
+   "sp": 0,
+   "jg": 0,
+   "jp": 0
+  },
+  {
+   "pos": 3,
+   "equipo": "SEMINARIO PADEL CLUB DERIO M5",
+   "puntos": 0,
+   "pj": 0,
+   "pg": 0,
+   "pp": 0,
+   "sg": 0,
+   "sp": 0,
+   "jg": 0,
+   "jp": 0
+  },
+  {
+   "pos": 4,
+   "equipo": "Padeltza Urdinak",
+   "puntos": 0,
+   "pj": 0,
+   "pg": 0,
+   "pp": 0,
+   "sg": 0,
+   "sp": 0,
+   "jg": 0,
+   "jp": 0
+  },
+  {
+   "pos": 5,
+   "equipo": "ASKARTZA TANIWA",
+   "puntos": 0,
+   "pj": 0,
+   "pg": 0,
+   "pp": 0,
+   "sg": 0,
+   "sp": 0,
+   "jg": 0,
+   "jp": 0
+  },
+  {
+   "pos": 6,
+   "equipo": "PADEL ZAMUDIO M6",
+   "puntos": 0,
+   "pj": 0,
+   "pg": 0,
+   "pp": 0,
+   "sg": 0,
+   "sp": 0,
+   "jg": 0,
+   "jp": 0
+  },
+  {
+   "pos": 7,
+   "equipo": "PADEL & GOL 5M1",
+   "puntos": 0,
+   "pj": 0,
+   "pg": 0,
+   "pp": 0,
+   "sg": 0,
+   "sp": 0,
+   "jg": 0,
+   "jp": 0
+  },
+  {
+   "pos": 8,
+   "equipo": "MARTIARTU AZUL",
+   "puntos": 0,
+   "pj": 0,
+   "pg": 0,
+   "pp": 0,
+   "sg": 0,
+   "sp": 0,
+   "jg": 0,
+   "jp": 0
+  },
+  {
+   "pos": 9,
+   "equipo": "PICo y Pala",
+   "puntos": 0,
+   "pj": 0,
+   "pg": 0,
+   "pp": 0,
+   "sg": 0,
+   "sp": 0,
+   "jg": 0,
+   "jp": 0
+  },
+  {
+   "pos": 10,
+   "equipo": "5 ENKARTERRI PADEL KLUBA",
+   "puntos": 0,
+   "pj": 0,
+   "pg": 0,
+   "pp": 0,
+   "sg": 0,
+   "sp": 0,
+   "jg": 0,
+   "jp": 0
+  }
  ],
- "avisos": []
+ "avisos": [
+  "J1: 500 Server Error: Internal Server Error for url: https://www.bizkaiapadel.com/Home/JornadaLiga/34?fase=60&grupoId=54&jornada=1",
+  "J2: 500 Server Error: Internal Server Error for url: https://www.bizkaiapadel.com/Home/JornadaLiga/34?fase=60&grupoId=54&jornada=2"
+ ]
 }
